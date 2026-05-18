@@ -2,24 +2,20 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
-# --- 1. الثوابت الفيزيائية الكونية الصارمة ---
-G = 6.67430e-11     # ثابت الجاذبية الكوني (m^3 kg^-1 s^-2)
-c = 299792458.0     # سرعة الضوء الدقيقة (m/s)
-hbar = 1.05457e-34  # ثابت بلانك المقلص (J s)
-l_planck = 1.61625e-35 # طول بلانك الطبيعي (m)
+G = 6.67430e-11     
+c = 299792458.0     
+hbar = 1.05457e-34  
+l_planck = 1.61625e-35 
 
-# --- 2. إعدادات الثقب الأسود الابتدائية ---
-M_initial = 1e11      # كتلة جبل (كجم)
-M_law = M_initial     # كتلة الثقب الخاصة بقانون أكرم الهندسي
-M_hawking = M_initial # كتلة الثقب الخاصة بمعادلة هوكينج
+M_initial = 1e11      
+M_law = M_initial     
+M_hawking = M_initial 
 
 R_horizon_init = (2 * G * M_initial) / (c**2)
 
-# --- 3. إعداد الشاشة المزدوجة للمواجهة ---
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 7), facecolor='black')
 fig.canvas.manager.set_window_title("Akram Physics Engine - First Principles Quantum Edition")
 
-# ضبط القسم الأيسر: المحاكاة البصرية
 ax1.set_facecolor('black')
 ax1.set_aspect('equal')
 ax1.set_xlim(-4, 4)
@@ -35,7 +31,6 @@ ax1.legend(loc="lower left", facecolor="black", labelcolor="white")
 text_info = ax1.text(0.02, 0.98, "", color="white", transform=ax1.transAxes, 
                      fontsize=9, fontname="monospace", va='top')
 
-# ضبط القسم الأيمن: المقارنة الحركية للكتلة
 ax2.set_facecolor('#111111')
 ax2.tick_params(colors='white')
 ax2.xaxis.label.set_color('white')
@@ -53,7 +48,6 @@ time_history = []
 your_mass_history = []
 hawk_mass_history = []
 
-# --- 4. شروط الحركة والخطوة الزمنية المتناهية الصغر ---
 r_particle = R_horizon_init * 3.5  
 v_particle = 0.0
 current_time = 0.0
@@ -62,7 +56,6 @@ dt_sim = time_to_fall / 180.0
 
 is_sim_ended = False
 
-# --- 5. محرك الحساب النظري المطور ---
 def update(frame):
     global r_particle, v_particle, current_time, M_law, M_hawking, is_sim_ended
     
@@ -92,24 +85,18 @@ def update(frame):
     current_time += dt_sim
     d_actual = max(r_particle - R_horizon_law, 1e-35)
     
-    # 1. حساب شدة الفوضى الأصلية (تساوي إنتروبيا الأفق * التمدد الزمني للجسيم)
     quantum_chaos = ((G * (M_law**2)) / (hbar * c)) * ((c * current_time) / d_actual)
     
-    # 2. بدلاً من 1e-57 اليدوية، نحسب النسبة الهندسية الحقيقية بين مساحة بلانك ومساحة الأفق الحالي ديناميكياً
     area_planck = l_planck**2
     area_horizon = 4 * np.pi * (R_horizon_law**2) if R_horizon_law > 0 else 1e-70
     geometric_ratio = area_planck / area_horizon
     
-    # 3. دمج القانون النقي الخالي من الأرقام المفروضة
-    # نستخدم خطوة المحاكاة dt كعامل تدرج زمني طبيعي للاشتقاق
     scaled_chaos = quantum_chaos * geometric_ratio * (dt_sim * 1e11)
 
     if scaled_chaos > 1.0 and M_law > 0:
-        # التناقص هنا يعتمد بشكل أساسي على النسبة الهندسية لبلانك
         M_law -= M_law * 0.05 * min(scaled_chaos / 10.0, 5.0)
         M_law = max(M_law, 0.0)
 
-    # انحلال هوكينج القياسي للمقارنة
     if M_hawking > M_initial * 0.005:
         hawking_loss = (hbar * (c**4)) / (15360 * np.pi * (G**2) * (M_hawking**2))
         scaled_hawk_loss = hawking_loss * 1.5e67 * dt_sim 
